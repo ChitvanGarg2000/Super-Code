@@ -1,11 +1,7 @@
 'use client'
 
-import React from 'react'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import Image from 'next/image'
-import { useState } from 'react'
 
 const AddNewButton = () => {
   return (

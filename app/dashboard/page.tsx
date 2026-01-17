@@ -1,9 +1,12 @@
 import AddNewButton from '@/features/dashboard/components/AddNewButton'
 import AddRepoButton from '@/features/dashboard/components/AddRepoButton'
 import { EmptyState } from '@/components/ui/empty-state'
+import { PlayGround } from '@/interfaces'
+import { getAllPlaygrounds } from '@/features/dashboard/actions'
+import ProjectsTable from '@/features/dashboard/components/ProjectsTable'
 
-const page = () => {
-  const playgrounds: any = []
+const page = async () => {
+  const playgrounds: PlayGround[] = await getAllPlaygrounds() || [];
   return (
     <div className='flex flex-col justify-start items-center min-h-screen max-w-7xl px-4 py-10'>
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full'>
@@ -16,7 +19,7 @@ const page = () => {
             <EmptyState title="No Playgrounds Yet" description="Get started by creating a new playground or adding an existing repository." imageSrc="/empty-state.svg" />
           </div>
         ): (
-          <div>Playgrounds List</div>
+          <ProjectsTable projects={playgrounds} onUpdateProject={() => {}} onDeleteProject={() => {}} onDuplicateProject={() => {}} />
         )}
       </div>
     </div>
