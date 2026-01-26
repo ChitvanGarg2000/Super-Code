@@ -27,14 +27,14 @@ import {
 import Image from "next/image";
 import { useState } from "react";
 import { templates } from "@/app/appData/templates";
-
+import { Templates } from "@/interfaces";
 // TemplateSelectionModal.tsx
 type TemplateSelectionModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: {
     title: string;
-    template: "REACT" | "NEXTJS" | "EXPRESS" | "VUE" | "HONO" | "ANGULAR";
+    template: Templates;
     description?: string;
   }) => void;
 };
@@ -92,7 +92,7 @@ const TemplateSelectionModal = ({
     if (selectedTemplate) {
       const templateMap: Record<
         string,
-        "REACT" | "NEXTJS" | "EXPRESS" | "VUE" | "HONO" | "ANGULAR"
+        Templates
       > = {
         react: "REACT",
         nextjs: "NEXTJS",
@@ -365,7 +365,7 @@ const TemplateSelectionModal = ({
                 Back
               </Button>
               <Button
-                className="bg-[#3846CE] hover:bg-[#d03636]"
+                className="bg-[#3846CE] hover:bg-[#3846CE]"
                 onClick={handleCreateProject}
               >
                 Create Project

@@ -3,7 +3,6 @@ import Image from "next/image";
 import { format } from "date-fns";
 import type { Project } from "../types";
 import { Badge } from "@/components/ui/badge";
-import { deletePlayground, updatePlayground, duplicatePlaygroundById } from "../actions";
 import {
     Table,
     TableBody,
@@ -52,10 +51,10 @@ import {
     Download,
     Eye,
 } from "lucide-react";
-import { toast } from "sonner";
+import { PlayGround } from "@/interfaces";
 
 interface ProjectsTableProps {
-    projects: Project[];
+    projects: PlayGround[];
     onUpdateProject?: Function
     onDeleteProject?: Function;
     onDuplicateProject?: Function;
@@ -66,12 +65,12 @@ interface EditProjectData {
     description: string;
 }
 const ProjectsTable = ({ projects, onUpdateProject, onDeleteProject, onDuplicateProject }: ProjectsTableProps) => {
-    const handleDeleteClick = async (projectId: Project) => {
-        await deletePlayground(projectId.id);
+    const handleDeleteClick = async (projectId: PlayGround) => {
+        await onDeleteProject?.(projectId.id);
     }
-    const handleEditClick = async (project: Project) => {
+    const handleEditClick = async (project: PlayGround) => {
     }
-    const handleDuplicateProject = async (project: Project) => {
+    const handleDuplicateProject = async (project: PlayGround) => {
 
     }
     const copyProjectUrl = async (projectId: string) => {
@@ -112,7 +111,7 @@ const ProjectsTable = ({ projects, onUpdateProject, onDeleteProject, onDuplicate
                                         <div className="w-8 h-8 rounded-full overflow-hidden">
                                             <Image
                                                 src={project.user.image || "/default-avatar.png"}
-                                                alt={project.user.name}
+                                                alt={project.user.name || "User Avatar"}
                                                 width={32}
                                                 height={32}
                                                 className="object-cover"

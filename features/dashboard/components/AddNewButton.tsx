@@ -4,14 +4,39 @@ import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import { useState } from 'react';
 import TempelateSelectionModal from '@/components/modal/TempelateSelectionModal';
+import { createPlayground } from '@/features/dashboard/actions';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import { Templates } from '@/interfaces';
+
 
 const AddNewButton = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedTemplate, setSelectedTemplate] = useState<{
         title: string,
-        template: "REACT" | "VUE" | "EXPRESS" | "NEXTJS" | "ANGULAR" | "HONO",
+        template: Templates,
         description?: string,
     } | null>(null);
+
+    const router = useRouter();
+
+    const handleSubmit =  async (data : {
+        title: string,
+        template: Templates,
+        description?: string,
+    }) => {
+        try{
+            setSelectedTemplate(data);
+            const newPlayground = await createPlayground(data);
+            toast.success("Playground created successfully!");
+
+            router.push('/playground/' + newPlayground.id);
+
+        }catch (error) {
+            console.log(error);
+        }
+    }
+
   return (
     <>
     <div role="button" className="group p-4 flex flex-row justify-between items-center border rounded-lg bg-muted cursor-pointer 
@@ -32,7 +57,7 @@ const AddNewButton = () => {
             </div>
 
         </div>
-        <TempelateSelectionModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSubmit={() => {}} />
+        <TempelateSelectionModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSubmit={handleSubmit} />
     </>
   )
 }

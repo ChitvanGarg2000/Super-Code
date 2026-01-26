@@ -1,7 +1,7 @@
 "use server"
 
 import { getCurrentUser as currentUser } from "@/features/auth/actions"
-import { Templates } from "@/generated/prisma/enums";
+import { Templates } from "@/interfaces";
 import { db } from "@/lib/db"
 import { revalidatePath } from "next/cache";
 
@@ -9,7 +9,6 @@ interface CreatePlaygroundParams {
     title: string;
     description?: string;
     template: Templates;
-    userId: string;
 }
 
 export const createPlayground = async (playgroundData: CreatePlaygroundParams) => {
@@ -62,7 +61,7 @@ export const getAllPlaygrounds = async () => {
 }
 
 
-export const deletePlayground = async (playgroundId: string) => {
+export const deletePlaygroundById = async (playgroundId: string) => {
     try {
         const user = await currentUser();
         if(!user) throw new Error("Please login to delete a playground");
@@ -79,7 +78,7 @@ export const deletePlayground = async (playgroundId: string) => {
     }
 }
 
-export const updatePlayground = async (playgroundId: string, data: { title: string, description: string, template: Templates }) => {
+export const updatePlaygroundById = async (playgroundId: string, data: { title: string, description: string, template: Templates }) => {
     try {
         const user = await currentUser();
         if(!user) throw new Error("Please login to update a playground");

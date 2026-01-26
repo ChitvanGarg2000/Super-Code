@@ -4,10 +4,11 @@ export type UserRole = "USER" | "ADMIN" | "PREMIUM_USER";
 export type Templates =
   | "REACT"
   | "VUE"
-  | "Express"
+  | "EXPRESS"
   | "NEXTJS"
   | "ANGULAR"
-  | "SVELTE";
+  | "SVELTE"
+  | "HONO";
 
 // Models
 
@@ -45,12 +46,12 @@ export interface Account {
 export interface PlayGround {
   id: string;
   title: string;
-  description?: string;
+  description: string | null;
   template: Templates;
   // Relation(s)
   starMarks?: StarMark[]; // present if included
   userId: string;
-  user?: User;
+  user: User;
   createdAt: Date;
   updatedAt: Date;
 }

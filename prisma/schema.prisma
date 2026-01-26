@@ -50,10 +50,11 @@ model Account {
 enum Templates {
   REACT
   VUE
-  Express
+  EXPRESS
   NEXTJS
   ANGULAR
   SVELTE
+  HONO
 }
 
 model PlayGround {

@@ -2,7 +2,7 @@ import AddNewButton from '@/features/dashboard/components/AddNewButton'
 import AddRepoButton from '@/features/dashboard/components/AddRepoButton'
 import { EmptyState } from '@/components/ui/empty-state'
 import { PlayGround } from '@/interfaces'
-import { getAllPlaygrounds } from '@/features/dashboard/actions'
+import { getAllPlaygrounds, deletePlaygroundById, updatePlaygroundById, duplicatePlaygroundById } from '@/features/dashboard/actions'
 import ProjectsTable from '@/features/dashboard/components/ProjectsTable'
 
 const page = async () => {
@@ -19,8 +19,7 @@ const page = async () => {
             <EmptyState title="No Playgrounds Yet" description="Get started by creating a new playground or adding an existing repository." imageSrc="/empty-state.svg" />
           </div>
         ): (
-          // @ts-ignore
-          <ProjectsTable projects={playgrounds} onUpdateProject={() => {}} onDeleteProject={() => {}} onDuplicateProject={() => {}} />
+          <ProjectsTable projects={playgrounds} onUpdateProject={updatePlaygroundById} onDeleteProject={deletePlaygroundById} onDuplicateProject={duplicatePlaygroundById} />
         )}
       </div>
     </div>
