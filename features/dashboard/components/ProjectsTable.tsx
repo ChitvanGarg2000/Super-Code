@@ -1,6 +1,6 @@
 "use client"
 import Image from "next/image";
-import { format } from "date-fns";
+import { format, set } from "date-fns";
 import type { Project } from "../types";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -52,6 +52,7 @@ import {
     Eye,
 } from "lucide-react";
 import { PlayGround } from "@/interfaces";
+import { toast } from "sonner";
 
 interface ProjectsTableProps {
     projects: PlayGround[];
@@ -65,15 +66,75 @@ interface EditProjectData {
     description: string;
 }
 const ProjectsTable = ({ projects, onUpdateProject, onDeleteProject, onDuplicateProject }: ProjectsTableProps) => {
-    const handleDeleteClick = async (projectId: PlayGround) => {
-        await onDeleteProject?.(projectId.id);
+    const [selectedProject, setSelectedProject] = useState<PlayGround | null>(null);
+    const [editData, setEditData] = useState<EditProjectData>({
+        title: "",
+        description: "",
+    });
+    const [isEditDialogOpen, setEditDialogOpen] = useState(false);
+    const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const handleDeleteClick = async (project: PlayGround) => {
+        setSelectedProject(project)
+        setDeleteDialogOpen(true);
     }
     const handleEditClick = async (project: PlayGround) => {
+        setSelectedProject(project);
+        setEditData({
+            title: project.title,
+            description: project.description || "",
+        })
+        setEditDialogOpen(true);
     }
-    const handleDuplicateProject = async (project: PlayGround) => {
 
+    const handleDeleteProject = async () => {
+        if (!selectedProject) return;
+        try {
+            await onDeleteProject?.(selectedProject.id);
+            setDeleteDialogOpen(false);
+            setSelectedProject(null);
+            toast.success("Project deleted successfully");
+
+        } catch (error) {
+            console.error("Error deleting project:", error);
+            toast.error("Failed to delete project");
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    const handleUpdateProject = async () => {
+        if (!selectedProject) return;
+        try {
+            setIsLoading(true);
+            await onUpdateProject?.(selectedProject.id, editData);
+            setEditDialogOpen(false);
+            toast.success("Project updated successfully");
+        } catch (error) {
+            console.error("Error updating project:", error);
+            toast.error("Failed to update project");
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    const handleDuplicateProject = async (project: PlayGround) => {
+        setIsLoading(true);
+        try {
+            await onDuplicateProject?.(project.id);
+            toast.success("Project duplicated successfully");
+
+        } catch (error) {
+            console.error("Error duplicating project:", error);
+            toast.error("Failed to duplicate project");
+        } finally {
+            setIsLoading(false);
+        }
     }
     const copyProjectUrl = async (projectId: string) => {
+        const projectUrl = `${window.location.origin}/playground/${projectId}`;
+        navigator.clipboard.writeText(projectUrl);
+        toast.success("Project URL copied to clipboard");
     }
     return (
         <>
@@ -103,6 +164,7 @@ const ProjectsTable = ({ projects, onUpdateProject, onDeleteProject, onDuplicate
                                         <Link href={`/playground/${project.id}`} className="hover:underline">
                                             <span className="font-semibold">{project.title}</span>
                                         </Link>
+                                        <span className="text-sm text-gray-500 line-clamp-1">{project.description}</span>
                                     </div>
                                 </TableCell>
                                 <TableCell>{format(new Date(project.createdAt), "MMM d, yyyy")}</TableCell>
@@ -129,12 +191,6 @@ const ProjectsTable = ({ projects, onUpdateProject, onDeleteProject, onDuplicate
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end" className="w-48">
-                                            {/* <DropdownMenuItem asChild>
-                                                <MarkedToggleButton
-                                                    markedForRevision={project.Starmark[0]?.isMarked}
-                                                    id={project.id}
-                                                />
-                                            </DropdownMenuItem> */}
                                             <DropdownMenuItem asChild>
                                                 <Link
                                                     href={`/playground/${project.id}`}
@@ -189,6 +245,56 @@ const ProjectsTable = ({ projects, onUpdateProject, onDeleteProject, onDuplicate
                     </TableBody>
                 </Table>
             </div>
+            <Dialog open={isEditDialogOpen} onOpenChange={setEditDialogOpen}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Edit Project</DialogTitle>
+                        <DialogDescription>
+                            Make changes to your project title and description here. Click save when you're done.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <Label htmlFor="title">
+                            Project Title
+                        </Label>
+                        <Input type="text" id="title" value={editData.title}
+                            onChange={(e) => setEditData({ ...editData, title: e.target.value })} placeholder="Edit prohject title" />
+                    </div>
+                    <div className="grid gap-4 py-4">
+                        <Label htmlFor="description">
+                            Project Description
+                        </Label>
+                        <Textarea id="description" value={editData.description}
+                            onChange={(e) => setEditData({ ...editData, description: e.target.value })} placeholder="Edit project description" />
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setEditDialogOpen(false)}>Cancel</Button>
+                        <Button onClick={handleUpdateProject} disabled={isLoading}>
+                            {isLoading ? "Saving..." : "Save"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+            <AlertDialog open={isDeleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure you want to delete this project?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete your project and remove all associated data.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            className="bg-destructive hover:bg-red-700 focus:ring-red-600"
+                            onClick={handleDeleteProject}
+                            disabled={isLoading}
+                        >
+                            {isLoading ? "Deleting..." : "Delete"}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </>
     )
 }
