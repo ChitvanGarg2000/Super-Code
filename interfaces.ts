@@ -66,3 +66,15 @@ export interface StarMark {
   user?: User;
   playground?: PlayGround;
 }
+
+export interface TemplateOptions {
+  id: string;
+  name: string;
+  description?: string;
+  icon: string;
+  color: string;
+  popularity: number;
+  tags: string[];
+  features: string[];
+  category: "frontend" | "backend" | "fullstack";
+}

@@ -2,14 +2,23 @@
 
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
+import { useState } from 'react';
+import TempelateSelectionModal from '@/components/modal/TempelateSelectionModal';
 
 const AddNewButton = () => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedTemplate, setSelectedTemplate] = useState<{
+        title: string,
+        template: "REACT" | "VUE" | "EXPRESS" | "NEXTJS" | "ANGULAR" | "HONO",
+        description?: string,
+    } | null>(null);
   return (
-    <div className="group p-4 flex flex-row justify-between items-center border rounded-lg bg-muted cursor-pointer 
+    <>
+    <div role="button" className="group p-4 flex flex-row justify-between items-center border rounded-lg bg-muted cursor-pointer 
         transition-all duration-300 ease-in-out
         hover:bg-background hover:border-[#3846CE] hover:scale-[1.02]
         shadow-[0_2px_10px_rgba(0,0,0,0.08)]
-        hover:shadow-[0_10px_30px_rgba(56,70,206,0.15)]">
+        hover:shadow-[0_10px_30px_rgba(56,70,206,0.15)]" onClick={() => setIsModalOpen(true)}>
             <div className='flex flex-row justify-center items-center'>
 
                 <Button variant={"outline"} className='flex justify-center items-center bg-white group-hover:bg-[#fff8f8] group-hover:border-[#3846CE] group-hover:text-white transition-colors duration-300'>
@@ -23,7 +32,8 @@ const AddNewButton = () => {
             </div>
 
         </div>
-
+        <TempelateSelectionModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSubmit={() => {}} />
+    </>
   )
 }
 

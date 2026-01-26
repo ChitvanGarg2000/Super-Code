@@ -19,6 +19,7 @@ const page = async () => {
             <EmptyState title="No Playgrounds Yet" description="Get started by creating a new playground or adding an existing repository." imageSrc="/empty-state.svg" />
           </div>
         ): (
+          // @ts-ignore
           <ProjectsTable projects={playgrounds} onUpdateProject={() => {}} onDeleteProject={() => {}} onDuplicateProject={() => {}} />
         )}
       </div>
