@@ -109,11 +109,6 @@ const TemplateSelectionModal = ({
         description: template?.description,
       });
 
-      console.log(
-        `Creating ${projectName || "new project"} with template: ${
-          template?.name
-        }`
-      );
       onClose();
       // Reset state for next time
       setStep("select");

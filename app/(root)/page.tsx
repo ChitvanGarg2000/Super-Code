@@ -20,7 +20,7 @@ dark:from-purple-400 dark:via-indigo-400 dark:to-blue-400"> SuperCode AI Editor<
         efficiently.
       </p>
       <Link href={"/dashboard"}>
-        <Button variant={"brand"} className="mb-4 cursor-pointer" size={"lg"}>
+        <Button variant={"brand"} className="mb-4 cursor-pointer bg-[#3646d1]" size={"lg"}>
           Get Started
           <ArrowUpRight className="w-3.5 h-3.5" />
         </Button>
