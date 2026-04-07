@@ -79,3 +79,33 @@ export interface TemplateOptions {
   features: string[];
   category: "frontend" | "backend" | "fullstack";
 }
+
+export interface TemplateFile {
+  filename: string
+  fileExtension: string
+  content: string
+}
+
+/**
+ * Represents a folder in the template structure which can contain files and other folders
+ */
+export interface TemplateFolder {
+  folderName: string
+  items: (TemplateFile | TemplateFolder)[]
+}
+
+// Union type for items in the file system
+export type TemplateItem = TemplateFile | TemplateFolder
+
+export interface TemplateFileTreeProps {
+  data: TemplateItem
+  onFileSelect?: (file: TemplateFile) => void
+  selectedFile?: TemplateFile
+  title?: string
+  onAddFile?: (file: TemplateFile, parentPath: string) => void
+  onAddFolder?: (folder: TemplateFolder, parentPath: string) => void
+  onDeleteFile?: (file: TemplateFile, parentPath: string) => void
+  onDeleteFolder?: (folder: TemplateFolder, parentPath: string) => void
+  onRenameFile?: (file: TemplateFile, newFilename: string, newExtension: string, parentPath: string) => void
+  onRenameFolder?: (folder: TemplateFolder, newFolderName: string, parentPath: string) => void
+}
