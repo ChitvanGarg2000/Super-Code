@@ -11,6 +11,7 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarMenu,
+  SidebarRail,
 } from "@/components/ui/sidebar"
 import {
   DropdownMenu,
@@ -21,6 +22,8 @@ import {
 
 import { TemplateFileTreeProps, TemplateFolder } from "@/interfaces"
 import { TemplateNode } from "./templateNode"
+import NewFileDialog from "./Dialog/NewFileDialog"
+import NewFolderDialog from "./Dialog/NewFolderDialog"
 
 export const TemplateFiletree = ({
   data,
@@ -35,6 +38,40 @@ export const TemplateFiletree = ({
   onRenameFolder,
 }: TemplateFileTreeProps) => {
     const isRootFolder = data != null && typeof data === "object" && "folderName" in data;
+    const [isNewFileDialogOpen, setIsNewFileDialogOpen] = React.useState(false);
+    const [isNewFolderDialogOpen, setIsNewFolderDialogOpen] = React.useState(false);
+
+    const handleOpenNewFileDialog = () => {
+      setIsNewFileDialogOpen(true);
+    }
+
+    const handleOpenNewFolderDialog = () => {
+      setIsNewFolderDialogOpen(true);
+    }
+
+    const handleAddRootFile = (filename: string, extension: string) => {
+      onAddFile?.(
+        {
+          filename,
+          fileExtension: extension,
+          content: "",
+        },
+        ""
+      );
+      setIsNewFileDialogOpen(false);
+    }
+
+    const handleAddRootFolder = (folderName: string) => {
+      onAddFolder?.(
+        {
+          folderName,
+          items: [],
+        },
+        ""
+      );
+      setIsNewFolderDialogOpen(false);
+    }
+
     return (
         <Sidebar>
             <SidebarContent>
@@ -48,11 +85,11 @@ export const TemplateFiletree = ({
                             </SidebarGroupAction>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent>
-                            <DropdownMenuItem onClick={() => {}}>
+                            <DropdownMenuItem onClick={handleOpenNewFolderDialog}>
                               <FolderPlus />
                               New Folder
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => {}}>
+                            <DropdownMenuItem onClick={handleOpenNewFileDialog}>
                               <FilePlus />
                               New File
                             </DropdownMenuItem>
@@ -68,6 +105,9 @@ export const TemplateFiletree = ({
                     </SidebarGroupContent>
                 </SidebarGroup>
             </SidebarContent>
+            <SidebarRail />
+            <NewFileDialog isOpen={isNewFileDialogOpen} onClose={() => setIsNewFileDialogOpen(false)} onCreateFile={handleAddRootFile} />
+            <NewFolderDialog isOpen={isNewFolderDialogOpen} onClose={() => setIsNewFolderDialogOpen(false)} onCreateFolder={handleAddRootFolder} />
         </Sidebar>
     )
 }
