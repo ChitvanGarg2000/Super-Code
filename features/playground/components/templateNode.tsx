@@ -24,6 +24,7 @@ import NewFolderDialog from "./Dialog/NewFolderDialog"
 import { DeleteDialog } from "./Dialog/DeleteDialog"
 import RenameFileDialog from "./Dialog/RenameFileDialog"
 import NewFileDialog from "./Dialog/NewFileDialog"
+import { useFileExplorer } from "../hooks/useFileExplorer"
 
 export interface TemplateNodeProps {
     item: TemplateFile | TemplateFolder,
@@ -219,9 +220,9 @@ export const TemplateNode = ({
     return (
         <SidebarMenuItem>
             <SidebarMenuButton
-                isActive={!!isSelected}
+                isActive={isSelected}
                 onClick={() => onFileSelect?.(item)}
-                className="font-normal"
+                className="font-normal flex-1 cursor-pointer"
             >
                 <File className="text-muted-foreground" />
                 <span>{item.filename}{item.fileExtension ? `.${item.fileExtension}` : ""}</span>

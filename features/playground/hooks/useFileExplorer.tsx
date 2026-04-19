@@ -82,6 +82,7 @@ export const useFileExplorer = create<FileExplorerState>((set, get) => ({
         const existingFile = get().openFiles.find((f) => f.id === fileId);
         if (existingFile) {
             set({ activeFileId: existingFile.id, editorContent: existingFile.content });
+            return;
         }
 
         const newOpenFile: OpenFile = {
