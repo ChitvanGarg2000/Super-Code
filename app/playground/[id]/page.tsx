@@ -13,8 +13,9 @@ import { Button } from "@/components/ui/button"
 import { Bot, Save, Settings2, FileText, X } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ResizablePanelGroup, ResizablePanel } from "@/components/ui/resizable"
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable"
 import PlaygroundEditor from "@/features/playground/components/PlaygroundEditor"
+import { useWebContainer } from "@/features/web-containers/hooks/useWebContainer"
 
 export default function Page() {
   const { id } = useParams<{ id: string }>()
@@ -38,6 +39,8 @@ export default function Page() {
     setPlaygroundId,
     updateFileContent,
   } = useFileExplorer();
+
+  const { serverUrl, writeFileSync, destroy, isLoading: isWebContainerLoading, error: webContainerError, instance } = useWebContainer({ templateData });
 
   useEffect(() => {
     if (id) {
@@ -202,6 +205,16 @@ export default function Page() {
                       }}
                     />
                   </ResizablePanel>
+
+                  {
+                    isPreviewVisible && (
+                      <>
+                        <ResizableHandle />
+                        <ResizablePanel defaultSize={50} />
+                        <WebContainerPreview serverUrl={serverUrl} isLoading={isWebContainerLoading} error={webContainerError} instance={instance} />
+                      </>
+                    )
+                  }
                 </ResizablePanelGroup>
               </div>
             </div>) : (
