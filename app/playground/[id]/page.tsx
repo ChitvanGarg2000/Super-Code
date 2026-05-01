@@ -10,11 +10,14 @@ import { useFileExplorer } from "@/features/playground/hooks/useFileExplorer"
 import { TemplateFile } from "@/features/playground/types"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Button } from "@/components/ui/button"
-import { Bot, Save, Settings2, FileText, X } from "lucide-react"
+import { Bot, Save, Settings2, FileText, X, FolderOpen } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ResizablePanelGroup, ResizablePanel } from "@/components/ui/resizable"
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable"
 import PlaygroundEditor from "@/features/playground/components/PlaygroundEditor"
+import { useWebContainer } from "@/features/web-containers/hooks/useWebContainer"
+import WebContainerPreview from "@/features/web-containers/components/WebContainerPreview"
+import LoadingStep from "@/components/ui/loadingStep"
 
 export default function Page() {
   const { id } = useParams<{ id: string }>()
@@ -39,6 +42,8 @@ export default function Page() {
     updateFileContent,
   } = useFileExplorer();
 
+  const { serverUrl, writeFileSync, destroy, isLoading: isWebContainerLoading, error: webContainerError, instance } = useWebContainer({ templateData });
+
   useEffect(() => {
     if (id) {
       setPlaygroundId(id);
@@ -61,6 +66,57 @@ export default function Page() {
   const handleFileSelect = (file: TemplateFile) => {
     console.log("Selected file:", file);
     openFile(file);
+  }
+
+  if(error){
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-center">
+          <X className="mx-auto mb-4 h-12 w-12 text-red-500" /> 
+          <h2 className="text-2xl font-semibold mb-2">Failed to load playground try again later</h2>
+        </div>
+      </div>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)] p-4">
+        <div className="w-full max-w-md p-6 rounded-lg shadow-sm border">
+          <h2 className="text-xl font-semibold mb-6 text-center">
+            Loading Playground
+          </h2>
+          <div className="mb-8">
+            <LoadingStep
+              currentStep={1}
+              step={1}
+              label="Loading playground data"
+            />
+            <LoadingStep
+              currentStep={2}
+              step={2}
+              label="Setting up environment"
+            />
+            <LoadingStep currentStep={3} step={3} label="Ready to code" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // No template data
+  if (!templateData) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)] p-4">
+        <FolderOpen className="h-12 w-12 text-amber-500 mb-4" />
+        <h2 className="text-xl font-semibold text-amber-600 mb-2">
+          No template data available
+        </h2>
+        <Button onClick={() => window.location.reload()} variant="outline">
+          Reload Template
+        </Button>
+      </div>
+    );
   }
   return (
     <TooltipProvider>
@@ -190,6 +246,7 @@ export default function Page() {
                 </Tabs>
               </div>
               <div className="flex-1">
+                {/* @ts-ignore */}
                 <ResizablePanelGroup direction="horizontal" className="h-full">
                   <ResizablePanel minSize={200} defaultSize={isPreviewVisible ? 50 : 100}>
                     <PlaygroundEditor
@@ -202,6 +259,24 @@ export default function Page() {
                       }}
                     />
                   </ResizablePanel>
+
+                  {
+                    isPreviewVisible && (
+                      <>
+                        <ResizableHandle />
+                        <ResizablePanel minSize={240} defaultSize={50}>
+                          <WebContainerPreview
+                            templateData={templateData ?? { folderName: "Root", items: [] }}
+                            serverUrl={serverUrl}
+                            isLoading={isWebContainerLoading}
+                            error={webContainerError}
+                            instance={instance}
+                            writeFileSync={writeFileSync}
+                          />
+                        </ResizablePanel>
+                      </>
+                    )
+                  }
                 </ResizablePanelGroup>
               </div>
             </div>) : (
