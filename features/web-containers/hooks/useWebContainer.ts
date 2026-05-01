@@ -3,6 +3,29 @@ import { useEffect, useState, useCallback } from 'react';
 import { TemplateFolder } from '@/features/playground/lib/path-to-json';
 import { UseWebContainerReturn } from '../interfaces';
 
+let sharedInstance: WebContainer | null = null;
+let sharedBootPromise: Promise<WebContainer> | null = null;
+
+const getOrBootWebContainer = async (): Promise<WebContainer> => {
+    if (sharedInstance) {
+        return sharedInstance;
+    }
+
+    if (!sharedBootPromise) {
+        sharedBootPromise = WebContainer.boot()
+            .then((instance) => {
+                sharedInstance = instance;
+                return instance;
+            })
+            .catch((error) => {
+                sharedBootPromise = null;
+                throw error;
+            });
+    }
+
+    return sharedBootPromise;
+};
+
 interface UseWebContainerProps {
     templateData: TemplateFolder
 }
@@ -18,28 +41,36 @@ export const useWebContainer = ({ templateData }: UseWebContainerProps): UseWebC
     const [serverUrl, setServerUrl] = useState<string | null>(null);
 
     useEffect(() => {
-        let instanceMounted = false;
+        if (typeof window !== 'undefined' && !window.crossOriginIsolated) {
+            setError('WebContainer requires cross-origin isolation. Make sure COOP and COEP headers are enabled and reload the page.');
+            setIsLoading(false);
+            return;
+        }
+
+        let isDisposed = false;
         const initializeWebContainer = async () => {
             try {
-                const instance = await WebContainer.boot();
+                const instance = await getOrBootWebContainer();
+                if (isDisposed) {
+                    return;
+                }
                 instance.on('server-ready', (_port, url) => setServerUrl(url));
                 setInstance(instance);
                 setIsLoading(false);
             } catch (error) {
+                if (isDisposed) {
+                    return;
+                }
                 const errorMessage = error instanceof Error ? error.message : String(error);
                 setError(errorMessage);
                 setIsLoading(false);
             }
         }
 
-        if (!instanceMounted) {
-            initializeWebContainer();
-            instanceMounted = true;
-        }
+        initializeWebContainer();
 
         return () => {
-            instance?.teardown();
-            instanceMounted = false;
+            isDisposed = true;
         }
     }, []);
 
@@ -63,12 +94,16 @@ export const useWebContainer = ({ templateData }: UseWebContainerProps): UseWebC
     }, [instance]);
 
     const destroy = useCallback(() => {
-        if (instance) {
-            instance.teardown();
-            setInstance(null);
-            setServerUrl(null);
+        if (sharedInstance) {
+            sharedInstance.teardown();
         }
-    }, [instance]);
+        sharedInstance = null;
+        sharedBootPromise = null;
+        setInstance(null);
+        setServerUrl(null);
+        setError(null);
+        setIsLoading(false);
+    }, []);
 
 
     return {
