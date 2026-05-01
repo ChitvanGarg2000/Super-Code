@@ -5,6 +5,7 @@ import { Terminal } from "@xterm/xterm"
 import { FitAddon } from "@xterm/addon-fit"
 import { WebLinksAddon } from "@xterm/addon-web-links"
 import { SearchAddon } from "@xterm/addon-search"
+import { WebContainer } from "@webcontainer/api"
 // @ts-ignore
 import "@xterm/xterm/css/xterm.css"
 
@@ -26,8 +27,8 @@ export interface TerminalRef {
     focusTerminal: () => void;
 }
 
-const TerminalComponent = forwardRef<TerminalRef, TerminalProps>(({
-    webcontainerUrl,
+const TerminalComponent = forwardRef<TerminalRef, TerminalComponentProps>(({
+    webContainerUrl,
     className,
     theme = "dark",
     webContainerInstance
