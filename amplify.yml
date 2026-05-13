@@ -8,7 +8,7 @@ frontend:
 
     build:
       commands:
-        - pnpm build
+        - pnpm run build
 
   artifacts:
     baseDirectory: .next

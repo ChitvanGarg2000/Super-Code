@@ -23,7 +23,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             image: user.image,
            
             accounts: {
-              // @ts-ignore
               create: {
                 type: account.type,
                 provider: account.provider,
@@ -34,7 +33,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
                 tokenType: account.token_type,
                 scope: account.scope,
                 idToken: account.id_token,
-                sessionState: account.session_state,
+                sessionState: account.session_state ? String(account.session_state) : null,
               },
             },
           },
@@ -66,8 +65,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
               tokenType: account.token_type,
               scope: account.scope,
               idToken: account.id_token,
-              // @ts-ignore
-              sessionState: account.session_state,
+              sessionState: account.session_state ? String(account.session_state) : null,
             },
           });
         }

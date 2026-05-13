@@ -1,7 +1,5 @@
 {
   "compilerOptions": {
-    "ignoreDeprecations": "6.0",
-    "esModuleInterop": true,
     "jsx": "react-jsx",
     "paths": {
       "@/*": [
@@ -27,7 +25,8 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "esModuleInterop": true
   },
   "include": [
     "next-env.d.ts",
@@ -38,6 +37,10 @@
     "**/*.tsx"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "supercode-starters",
+    "output",
+    ".next",
+    "dist"
   ]
 }
