@@ -5,7 +5,6 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "postinstall": "prisma generate",
     "build": "prisma generate && node fix-prisma-imports.js && next build",
     "build:with-db": "prisma generate && node fix-prisma-imports.js && npx prisma db push && next build",
     "start": "next start",
