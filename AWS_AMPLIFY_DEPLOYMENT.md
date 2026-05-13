@@ -84,6 +84,9 @@ openssl rand -hex 32
 2. Create a cluster and database
 3. Get connection string: `mongodb+srv://username:password@cluster.mongodb.net/dbname`
 4. Add this to environment variables as `DATABASE_URL`
+5. **Important:** Whitelist your MongoDB IP in Atlas:
+   - Go to **Security** → **Network Access**
+   - Add IP `0.0.0.0/0` to allow access from anywhere (for testing/production, consider restricting)
 
 ### 3.2 Option B: AWS DocumentDB (MongoDB-compatible)
 1. Go to **AWS DocumentDB Console**
@@ -92,10 +95,22 @@ openssl rand -hex 32
 4. Add to environment variables
 
 ### 3.3 Run Prisma Migrations
-After deployment:
-1. Connect to your deployed app via AWS Amplify terminal
-2. Or run locally with production database connection
-3. Execute: `pnpm prisma db push`
+After Amplify deployment succeeds:
+
+**Option 1: Using Amplify Console Terminal**
+1. Go to **Amplify Console** → **App Details** → **Backend Environments** 
+2. Open terminal
+3. Run: `pnpm exec prisma db push --skip-generate`
+
+**Option 2: Using Local Machine** 
+```bash
+# After deployment, run locally with production DATABASE_URL
+export DATABASE_URL="your-production-database-url"
+pnpm exec prisma db push
+```
+
+**Option 3: Automated (Recommended)**
+After first deployment, run: `bash post-deploy.sh`
 
 ## Step 4: Deploy to AWS Amplify
 
@@ -136,30 +151,29 @@ Click **"Save and deploy"** and wait for build to complete (5-15 minutes)
 3. Update `NEXTAUTH_URL` environment variable with new domain
 4. Redeploy application
 
-## Step 6: Troubleshooting
+## Troubleshooting AWS Amplify Build Failures
 
 ### Build Fails with Prisma Error
-- **Issue**: Prisma binary not found
-- **Solution**: Ensure `prisma generate` runs during build
-- **Update**: Modify `amplify.yml` to include Prisma setup
+- **Issue**: "Prisma db push failed" or migration timeout
+- **Solution**: Database migration is now separate from build. See Step 3.3 to run migrations after deployment.
 
-### Database Connection Timeout
-- **Issue**: Can't connect to MongoDB
-- **Solution**: 
-  - Check `DATABASE_URL` format
-  - Whitelist AWS Amplify IP range in MongoDB Atlas (0.0.0.0/0 for testing)
-  - Verify network connectivity
+### Build Fails with "command not found: pnpm"
+- **Issue**: pnpm not installed in Amplify build environment
+- **Solution**: Already handled in `amplify.yml` - installs pnpm globally in preBuild phase
 
-### NextAuth Session Issues
-- **Issue**: Sessions not persisting
-- **Solution**:
-  - Ensure `NEXTAUTH_SECRET` is set and consistent
-  - Check `NEXTAUTH_URL` matches deployment domain
-  - Clear browser cookies and try again
+### Build Fails with MongoDB Connection Error
+- **Issue**: Can't connect to MongoDB during build
+- **Solution**: Build no longer attempts DB connection. If needed after deployment:
+  - Check `DATABASE_URL` format is correct
+  - Whitelist MongoDB Atlas IP to `0.0.0.0/0` (or restrict later)
+  - Verify network connectivity from Amplify to MongoDB
 
-### 404 Errors on Routes
+### 404 Errors on Routes After Deployment
 - **Issue**: Dynamic routes return 404
-- **Solution**: Next.js pages should work out of the box; verify `next.config.ts` doesn't have conflicting settings
+- **Solution**: Next.js pages should work out of the box. Check:
+  - App deployed successfully in Amplify Console
+  - Custom domain configured if using one
+  - `NEXTAUTH_URL` environment variable matches deployment URL
 
 ## Step 7: Post-Deployment
 

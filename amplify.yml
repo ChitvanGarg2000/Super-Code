@@ -3,12 +3,20 @@ frontend:
   phases:
     preBuild:
       commands:
+        - echo "Installing pnpm..."
         - npm install -g pnpm
-        - pnpm install
+        - echo "Installing dependencies..."
+        - pnpm install --frozen-lockfile
+        - echo "Generating Prisma client..."
+        - pnpm exec prisma generate
+        - echo "Fixing Prisma imports..."
+        - node fix-prisma-imports.js
 
     build:
       commands:
-        - pnpm run build
+        - echo "Building Next.js application..."
+        - pnpm exec next build
+        - echo "Build completed successfully"
 
   artifacts:
     baseDirectory: .next
@@ -17,5 +25,9 @@ frontend:
 
   cache:
     paths:
-      - node_modules/**/*
-      - .pnpm-store/**/*
+      - 'node_modules/**/*'
+      - '.pnpm-store/**/*'
+      - '.next/cache/**/*'
+
+  logs:
+    - '/root/.npm/_logs/*'
