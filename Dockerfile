@@ -40,10 +40,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # ---- pnpm Package Manager Setup ----
-# Enable pnpm via corepack (included with Node 20)
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# Install pnpm directly instead of relying on corepack
+RUN npm install -g pnpm@latest
 
 # ---- Application Environment Variables ----
 # These are build-time defaults; runtime values should be passed via -e or .env
