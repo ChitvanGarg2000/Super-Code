@@ -19,6 +19,16 @@
 # ============================================================================
 FROM node:26-bookworm-slim AS base
 
+# Accept build arguments from .env file
+ARG NODE_ENV=production
+ARG DATABASE_URL
+ARG AUTH_SECRET
+ARG NEXT_PUBLIC_APP_URL
+ARG GITHUB_ID
+ARG GITHUB_SECRET
+ARG GOOGLE_CLIENT_ID
+ARG GOOGLE_SECRET
+
 # Set working directory
 WORKDIR /app
 
@@ -45,7 +55,14 @@ RUN npm install -g pnpm@latest
 
 # ---- Application Environment Variables ----
 # These are build-time defaults; runtime values should be passed via -e or .env
-ENV NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
+ENV DATABASE_URL=${DATABASE_URL}
+ENV AUTH_SECRET=${AUTH_SECRET}
+ENV NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
+ENV GITHUB_ID=${GITHUB_ID}
+ENV GITHUB_SECRET=${GITHUB_SECRET}
+ENV GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+ENV GOOGLE_SECRET=${GOOGLE_SECRET}
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 ENV NEXT_TELEMETRY_DISABLED=1
