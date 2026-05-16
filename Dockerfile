@@ -1,57 +1,36 @@
-# Build stage
-FROM node:20-alpine AS builder
+# syntax=docker/dockerfile:1
 
+FROM node:20-bookworm-slim AS base
 WORKDIR /app
 
-# Copy package files
+# pnpm via corepack (ships with Node 20)
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+FROM base AS deps
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-
-# Install pnpm
-RUN npm install -g pnpm
-
-# Install dependencies
 RUN pnpm install --frozen-lockfile
 
-# Copy source files
+FROM base AS build
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Generate Prisma client and fix imports
-RUN pnpm run generate
-
-# Build the application
+# Builds Next.js + generates Prisma client (see package.json)
 RUN pnpm run build
 
-# Production stage
-FROM node:20-alpine
+FROM base AS runner
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
 
-WORKDIR /app
+# Runtime files
+COPY --from=build /app/.next ./.next
+COPY --from=build /app/public ./public
+COPY --from=build /app/package.json ./package.json
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/generated ./generated
 
-# Install pnpm
-RUN npm install -g pnpm
-
-# Copy package files
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-
-# Install production dependencies only
-RUN pnpm install --frozen-lockfile --prod
-
-# Copy built application from builder stage
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/generated ./generated
-
-# Copy public directory if it exists
-COPY public ./public
-
-# Copy necessary config files
-COPY next.config.ts ./
-COPY prisma.config.ts ./
-
-# Expose port
 EXPOSE 3000
 
-# Environment variables
-ENV NODE_ENV=production
-
-# Start the application
-CMD ["pnpm", "start"]
+CMD ["node", "./node_modules/next/dist/bin/next", "start", "-p", "3000", "-H", "0.0.0.0"]
