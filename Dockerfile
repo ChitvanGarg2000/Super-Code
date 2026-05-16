@@ -17,7 +17,7 @@
 # ============================================================================
 # STAGE 1: BASE - Define base image and setup
 # ============================================================================
-FROM node:20-bookworm-slim AS base
+FROM node:26-bookworm-slim AS base
 
 # Set working directory
 WORKDIR /app
