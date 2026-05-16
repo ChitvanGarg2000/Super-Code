@@ -3,7 +3,8 @@
 generator client {
   provider      = "prisma-client-js"
   output        = "../generated/prisma"
-  binaryTargets = ["windows"]
+  // "native" makes Prisma generate binaries for the current OS (Linux on EC2/Docker, Windows on local dev).
+  binaryTargets = ["native"]
 }
 
 datasource db {

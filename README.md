@@ -51,12 +51,18 @@ pnpm dev
 
 Open `http://localhost:3000` in your browser.
 
+## Deployment
+
+- **EC2 (Docker):** see [`EC2_DOCKER_DEPLOYMENT.md`](./EC2_DOCKER_DEPLOYMENT.md)
+- **AWS Amplify:** see [`AWS_AMPLIFY_DEPLOYMENT.md`](./AWS_AMPLIFY_DEPLOYMENT.md)
+
 ## Available Scripts
 
 - `pnpm dev` - start the development server.
 - `pnpm lint` - run ESLint.
 - `pnpm generate` - generate the Prisma client and apply the local Prisma import fix.
-- `pnpm build` - generate Prisma client, fix imports, push the Prisma schema, and build the app.
+- `pnpm build` - generate Prisma client, fix imports, and build the app.
+- `pnpm build:with-db` - generate Prisma client, fix imports, push Prisma schema, and build the app.
 - `pnpm start` - start the production server.
 
 ## Project Structure
@@ -81,5 +87,6 @@ Open `http://localhost:3000` in your browser.
 ## Notes
 
 - Playground template JSON is generated from the matching folder inside `supercode-starters/`.
-- The build step runs `prisma generate`, applies the local Prisma import fix, pushes the schema, and then builds Next.js.
+- The build step runs `prisma generate`, applies the local Prisma import fix, and then builds Next.js.
+- If you need to push the Prisma schema to the database, use `pnpm build:with-db` (or run `pnpm exec prisma db push` separately).
 - Authenticated routes are protected by middleware, and `/auth/sign-in` is the public sign-in page.
