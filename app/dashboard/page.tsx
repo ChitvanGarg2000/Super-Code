@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import AddNewButton from '@/features/dashboard/components/AddNewButton'
 import AddRepoButton from '@/features/dashboard/components/AddRepoButton'
 import { EmptyState } from '@/components/ui/empty-state'

@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { SidebarProvider } from "@/components/ui/sidebar";
 import {DashboardSidebar} from "@/features/dashboard/components/DashboardSidebar";
 import { getAllPlaygrounds } from "@/features/dashboard/actions";

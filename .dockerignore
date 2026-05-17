@@ -1,0 +1,9 @@
+node_modules
+.next
+.git
+.env*
+
+# Optional noise
+.vscode
+.DS_Store
+*.log
