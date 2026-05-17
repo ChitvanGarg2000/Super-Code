@@ -5,6 +5,7 @@ import { db } from "./lib/db";
 import { getAccountByUserId, getUserById } from "@/features/auth/actions";
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
+  trustHost: true,
   callbacks: {
     async signIn({ user, account }) {
       if (!user || !account) return false;
