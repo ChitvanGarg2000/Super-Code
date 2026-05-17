@@ -92,6 +92,8 @@ DATABASE_URL=postgresql://supercode_user:$dbPassword@db:5432/supercode_db
 # NEXTAUTH
 AUTH_SECRET=$authSecret
 AUTH_URL=http://localhost:3000
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=$authSecret
 AUTH_TRUST_HOST=true
 
 # OAUTH - GitHub
