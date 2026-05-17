@@ -1,0 +1,16 @@
+[build]
+command = "prisma generate && node fix-prisma-imports.js && next build"
+functions = "netlify/functions"
+publish = ".next"
+
+[build.environment]
+NODE_VERSION = "20"
+PNPM_VERSION = "9.15.4"
+
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200
+
+[functions]
+nodejs_version = "24"
